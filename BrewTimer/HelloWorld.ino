@@ -59,7 +59,7 @@ void setup() {
 
 void loop() {
   
-  boolean printSerial = true; // turn true if you want to have serial monitor on
+  boolean printSerial = false; // turn true if you want to have serial monitor on
   
   // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
@@ -71,7 +71,8 @@ void loop() {
   
   //Serial printing for reading pins and things from board
   if(printSerial == true){
-    serial.print(analogRead(A0);
+    Serial.print(analogRead(A5));
+    Serial.print("\n");
   }
   
   
