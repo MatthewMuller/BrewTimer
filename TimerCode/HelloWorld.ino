@@ -48,6 +48,7 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 void setup() {
   
+  int serialTimer = 0         //uncomment for serial printing
   
   Serial.begin(9600);         //uncomment this line for serial print to be activated
   
@@ -71,6 +72,8 @@ void loop() {
   
   //Serial printing for reading pins and things from board
   if(printSerial == true){
+    
+    
     Serial.print(analogRead(A5));
     Serial.print("\n");
   }
