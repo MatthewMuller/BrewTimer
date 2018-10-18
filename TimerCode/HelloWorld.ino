@@ -48,7 +48,7 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 void setup() {
   
-  int serialTimer = 0         //uncomment for serial printing
+  int serialTimer = 0;         //uncomment for serial printing
   
   Serial.begin(9600);         //uncomment this line for serial print to be activated
   
@@ -56,30 +56,127 @@ void setup() {
   lcd.begin(16, 2);
   // Print a message to the LCD.
   lcd.print("humble beginings");
+  
 }
 
 void loop() {
   
-  boolean printSerial = false; // turn true if you want to have serial monitor on
+  boolean printSerial = false; // turn true if you want to have serial monitor print voltages on A5-A1
+  int buttonVoltage = 950;     //when button is pressed it shows a voltage over 1000
   
-  // set the cursor to column 0, line 1
-  // (note: line 1 is the second row, since counting begins with 0):
-  lcd.setCursor(0, 1);
-  // print the number of seconds since reset:
-  lcd.print(millis() / 1000);
+  /*If the first button is pressed*/
+  if(analogRead(A5) > buttonVoltage){
+    
+    // set up the LCD's number of columns and rows:
+    lcd.setCursor(0, 0);
+    // Print a message to the LCD.
+    lcd.print("                ");
+    
+    
+    // set up the LCD's number of columns and rows:
+    lcd.setCursor(0, 0);
+    // Print a message to the LCD.
+    lcd.print("Brew Thur 9:00p");
+    
+  }
   
+  /*If the second button is pressed*/
+  if(analogRead(A4) > buttonVoltage){
+    // set up the LCD's number of columns and rows:
+    lcd.setCursor(0, 0);
+    // Print a message to the LCD.
+    lcd.print("                ");
+    
+    
+    // set up the LCD's number of columns and rows:
+    lcd.setCursor(0, 0);
+    // Print a message to the LCD.
+    lcd.print("Hi Brandon!");
+    
+  }
   
+  /*If the fifth button is pressed*/
+  if(analogRead(A1) > buttonVoltage){
+    
+    boolean brewTimeSet = false;
+    int hour = 12;
+    int minute = 00;
+    char amPm = 'a';
+    
+    /*This loop will run until the brew time is set*/
+    while(!brewTimeSet){
+     
+      /*Next 5 lines clears the screen and resets the cursor to home*/
+      lcd.setCursor(0, 0);               //Set cursor to top left
+      lcd.print("                ");     //clear LCD
+      lcd.setCursor(0, 1);               //Set cursor to top left
+      lcd.print("                ");     //clear LCD
+      lcd.setCursor(0,0);                //Set the cursor to home 
+      
+      /*The next thre lines builds the brewTime to print to screen*/
+      String setTime = "Set Time  ";
+      setTime += hour;
+      setTime += ":";
+      
+      /*This adds 00 if the minute is not 10,20,30,40, or 50*/
+      if(minute == 0){
+        setTime += "00";
+      }
+      else{
+        setTime += minute;
+      }
+      
+      setTime += amPm;                 //append the am or pm char
+      
+      lcd.print(setTime);              //Display the current brew time        
+      
+      boolean confirm = false;
+      
+      /*This loop runs until the user confirms setTime is correct*/
+      while(!confirm){
+        
+        
+      }
+      
+      
+      
+      
+      
+      delay(1000);
+      
+    }
+    
+    // set up the LCD's number of columns and rows:
+    lcd.setCursor(0, 0);
+    // Print a message to the LCD.
+    lcd.print("                ");
+    
+    
+    // set up the LCD's number of columns and rows:
+    lcd.setCursor(0, 0);
+    // Print a message to the LCD.
+    lcd.print("Brew Thur 9:00p");
+    
+  }
   
   //Serial printing for reading pins and things from board
   if(printSerial == true){
+    Serial.print("A5 voltage is");
+    Serial.println(analogRead(A5));
+    Serial.print("A4 voltage is");
+    Serial.println(analogRead(A4));
+    Serial.print("A3 voltage is");
+    Serial.println(analogRead(A3));
+    Serial.print("A2 voltage is");
+    Serial.println(analogRead(A2));
+    Serial.print("A1 voltage is");
+    Serial.println(analogRead(A1));
     
-    
-    Serial.print(analogRead(A5));
-    Serial.print("\n");
+    Serial.println("\n");
   }
   
-  
-  
+ 
+  delay(1000);
   
 }
 
