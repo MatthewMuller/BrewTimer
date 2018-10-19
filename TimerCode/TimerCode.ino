@@ -1,30 +1,6 @@
-//www.elegoo.com
-//2016.06.13
-
 /*
-  LiquidCrystal Library - Hello World
-
- Demonstrates the use a 16x2 LCD display.  The LiquidCrystal
- library works with all LCD displays that are compatible with the
- Hitachi HD44780 driver. There are many of them out there, and you
- can usually tell them by the 16-pin interface.
-
- This sketch prints "Hello World!" to the LCD
- and shows the time.
-
-  The circuit:
- * LCD RS pin to digital pin 7
- * LCD Enable pin to digital pin 8
- * LCD D4 pin to digital pin 9
- * LCD D5 pin to digital pin 10
- * LCD D6 pin to digital pin 11
- * LCD D7 pin to digital pin 12
- * LCD R/W pin to ground
- * LCD VSS pin to ground
- * LCD VCC pin to 5V
- * 10K resistor:
- * ends to +5V and ground
- * wiper to LCD VO pin (pin 3)
+ This project was build ontop of a sketch and library created
+ and provided by the people below.
 
  Library originally added 18 Apr 2008
  by David A. Mellis
@@ -36,9 +12,9 @@
  by Tom Igoe
 
  This example code is in the public domain.
-
  http://www.arduino.cc/en/Tutorial/LiquidCrystal
  */
+
 
 // include the library code:
 #include <LiquidCrystal.h>
@@ -46,59 +22,37 @@
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
+
+
+/*-------------------------------------SETUP-----------------------------------------*/
 void setup() {
+   
+  /*The following two lines set the cursor to home 
+  and print the welcome message*/
+  lcd.begin(16, 2);            
+  lcd.print("Set a time");
   
-  int serialTimer = 0;         //uncomment for serial printing
-  
-  Serial.begin(9600);         //uncomment this line for serial print to be activated
-  
-  // set up the LCD's number of columns and rows:
-  lcd.begin(16, 2);
-  // Print a message to the LCD.
-  lcd.print("humble beginings");
+  /*Turn on the serial brinter at a 9600 baud*/
+  Serial.begin(9600);         
   
 }
 
+
+/*--------------------------------------LOOP-----------------------------------------*/
 void loop() {
   
-  boolean printSerial = false; // turn true if you want to have serial monitor print voltages on A5-A1
-  int buttonVoltage = 950;     //when button is pressed it shows a voltage over 1000
+  /*Uncomment the lines below to turn on the serial printer debugger*/
+  boolean printSerial = true;  // turn true if you want to have serial monitor print voltages on A5-A1
+  int serialTimer = 750;        //uncomment for serial printing
+
+  /*This is the threshhold for */
+  int buttonVoltage = 950;      //when button is pressed it shows a voltage over 1000
   
-  /*If the first button is pressed*/
-  if(analogRead(A5) > buttonVoltage){
-    
-    // set up the LCD's number of columns and rows:
-    lcd.setCursor(0, 0);
-    // Print a message to the LCD.
-    lcd.print("                ");
-    
-    
-    // set up the LCD's number of columns and rows:
-    lcd.setCursor(0, 0);
-    // Print a message to the LCD.
-    lcd.print("Brew Thur 9:00p");
-    
-  }
-  
-  /*If the second button is pressed*/
-  if(analogRead(A4) > buttonVoltage){
-    // set up the LCD's number of columns and rows:
-    lcd.setCursor(0, 0);
-    // Print a message to the LCD.
-    lcd.print("                ");
-    
-    
-    // set up the LCD's number of columns and rows:
-    lcd.setCursor(0, 0);
-    // Print a message to the LCD.
-    lcd.print("Hi Brandon!");
-    
-  }
-  
-  /*If the fifth button is pressed*/
+  /*When the fifth button (set brew time button) is pressed*/
   if(analogRead(A1) > buttonVoltage){
     
-    boolean brewTimeSet = false;
+    /*initalize values default to 12:00a*/
+    boolean brewTimeSet = false;  
     int hour = 12;
     int minute = 00;
     char amPm = 'a';
@@ -106,43 +60,85 @@ void loop() {
     /*This loop will run until the brew time is set*/
     while(!brewTimeSet){
      
-      /*Next 5 lines clears the screen and resets the cursor to home*/
-      lcd.setCursor(0, 0);               //Set cursor to top left
-      lcd.print("                ");     //clear LCD
-      lcd.setCursor(0, 1);               //Set cursor to top left
-      lcd.print("                ");     //clear LCD
-      lcd.setCursor(0,0);                //Set the cursor to home 
-      
-      /*The next thre lines builds the brewTime to print to screen*/
-      String setTime = "Set Time  ";
-      setTime += hour;
-      setTime += ":";
-      
-      /*This adds 00 if the minute is not 10,20,30,40, or 50*/
-      if(minute == 0){
-        setTime += "00";
-      }
-      else{
-        setTime += minute;
-      }
-      
-      setTime += amPm;                 //append the am or pm char
-      
-      lcd.print(setTime);              //Display the current brew time        
-      
-      boolean confirm = false;
+      clearLCDScreen();                              //clear the LCD screen
+      displaySetTimeScreen(hour, minute, amPm);      //display the current set time screen
+         
+      boolean confirmTime = false;
       
       /*This loop runs until the user confirms setTime is correct*/
-      while(!confirm){
+      while(!confirmTime){
         
         
-      }
+        /*If the minus hour button is hit*/
+        if(analogRead(A5) > buttonVoltage){
+          
+          /*If we are at 1, we have to "roll over" back to twelve*/
+          if(hour == 1){
+            
+            hour = 12;                   //roll clock over from 1 to 12                 
+            
+            /*If statement will roll am over to pm 
+            and visa versa when clock rolls over*/
+            if(amPm == 'a'){             //if its am, switch it to pm
+              amPm = 'p';
+            }
+            else{
+              amPm = 'a';                //pm switches to am
+            }
+            
+          }
+          
+          else{
+            hour -= 1;                  //minus an hour
+          }          
+        }
+        
+        /*If the plus hour button is hit*/
+        if(analogRead(A4) > buttonVoltage){
+          if(hour == 12){
+            
+            hour = 1;                    //roll clock over from 12 to 1
+            
+            /*If statement will roll am over to pm 
+            and visa versa when clock rolls over*/
+            if(amPm == 'a'){             //if its am, switch it to pm
+              amPm = 'p';
+            }
+            else{
+              amPm = 'a';                //pm switches to am
+            }
+          }
+          else{
+            hour += 1;
+          }          
+        }
+        
+        /*If the minus minute button is hit*/
+        if(analogRead(A3) > buttonVoltage){
+          if(minute == 00){
+            minute = 45;
+          }
+          else{
+            minute -= 15;
+          }          
+        }
+        
+        /*If the plus minute button is hit*/
+        if(analogRead(A2) > buttonVoltage){
+          if(minute == 45){
+            minute = 00;
+          }
+          else{
+            minute += 10;
+          }          
+        }
+        
+        delay(250);
+        displaySetTimeScreen(hour, minute, amPm); 
+        
+      }       
       
-      
-      
-      
-      
-      delay(1000);
+      delay(250);
       
     }
     
@@ -161,6 +157,62 @@ void loop() {
   
   //Serial printing for reading pins and things from board
   if(printSerial == true){
+    serialDebug(serialTimer);
+  }
+  
+  delay(1000);
+  
+}
+
+void displaySetTimeScreen(int hour, int minute, char amPm){
+  
+    /*This will be displayed on the bottom row*/
+    String setTimeBottomLine = "***edit values***";
+    
+  
+    /*The next thre lines builds the brewTime to print to screen*/
+    String setTime = "Set Time  ";
+    setTime += hour;
+    setTime += ":";
+    
+    /*This adds 00 if the minute is not 10,20,30,40, or 50*/
+    if(minute == 0){
+      setTime += "00";
+    }
+    else{
+      setTime += minute;
+    }
+    
+    setTime += amPm;                 //append the am or pm char
+    
+    
+    printToLCD(setTime, setTimeBottomLine);              //Display the current brew time       
+  
+}
+
+
+void printToLCD(String top, String bottom){
+  
+  clearLCDScreen();
+  lcd.setCursor(0, 0);               //Set cursor to top left
+  lcd.print(top);     //clear LCD
+  lcd.setCursor(0, 1);               //Set cursor to top left
+  lcd.print(bottom);     //clear LCD
+  lcd.setCursor(0,0);                //Return the cursor to home
+}
+
+void clearLCDScreen(){
+  
+    /*Next 5 lines clears the screen and resets the cursor to home*/
+    lcd.setCursor(0, 0);               //Set cursor to top left
+    lcd.print("                ");     //clear LCD
+    lcd.setCursor(0, 1);               //Set cursor to top left
+    lcd.print("                ");     //clear LCD
+    lcd.setCursor(0,0);                //Set the cursor to home
+    
+}
+
+void serialDebug(int delayTime){
     Serial.print("A5 voltage is");
     Serial.println(analogRead(A5));
     Serial.print("A4 voltage is");
@@ -171,12 +223,7 @@ void loop() {
     Serial.println(analogRead(A2));
     Serial.print("A1 voltage is");
     Serial.println(analogRead(A1));
-    
     Serial.println("\n");
-  }
-  
- 
-  delay(1000);
-  
+    delay(delayTime);
 }
 
