@@ -159,9 +159,9 @@ void loop() {
       String day = days[0];
       
       boolean confirmDay = false;
+      int currentDay = 0;
+      
       while(!confirmDay){
-        
-        int currentDay = 0;
         
         /*If the confirm minute button is hit*/
         if(analogRead(A5) > buttonVoltage){
@@ -182,7 +182,7 @@ void loop() {
         if(analogRead(A4) > buttonVoltage){
           
           if(currentDay == 6){
-           currentDay = 1; 
+           currentDay = 0; 
           }
           else{
             currentDay += 1;
@@ -198,7 +198,7 @@ void loop() {
         }
         
         delay(refreshRate);
-        displaySetTimeScreen(hour, minute, amPm); 
+        displaySetDayScreen(day); 
         
       }
       
@@ -232,27 +232,12 @@ void displaySetDayScreen(String day){
     String setDayBottomLine = "***edit day***";
     
     
-    String setDayTopLine = "";
+    String setDayTopLine = "Day? ";
     
-    int dayLength = day.length();
+    setDayTopLine += day;
+    printToLCD(setDayTopLine, setDayBottomLine);
     
     
-    if(dayLength == 6){
-      
-      setDayTopLine += day;
-    }
-    else if(dayLength == 7){
-      
-    }
-    else if(dayLength == 8){
-      
-    }
-    else{
-      
-    }
-  
-  
-  
   
 }
 
@@ -263,7 +248,7 @@ void displaySetTimeScreen(int hour, int minute, char amPm){
     
   
     /*The next thre lines builds the brewTime to print to screen*/
-    String setTime = "Set Time  ";
+    String setTime = "Time?  ";
     setTime += hour;
     setTime += ":";
     
@@ -277,15 +262,6 @@ void displaySetTimeScreen(int hour, int minute, char amPm){
     
     setTime += amPm;                 //append the am or pm char
     
-    Serial.print("hour is ");
-    Serial.print(hour);
-    Serial.print("\n");
-    Serial.print("minute is ");
-    Serial.print(minute);
-    Serial.print("\n");
-    Serial.print("amPm is ");
-    Serial.print(amPm);
-    Serial.print("\n");
     printToLCD(setTime, setTimeBottomLine);              //Display the current brew time       
   
 }
