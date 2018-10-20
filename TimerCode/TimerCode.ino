@@ -42,200 +42,229 @@ void setup() {
 void loop() {
   
   /*Uncomment the lines below to turn on the serial printer debugger*/
-  boolean printSerial = true;  // turn true if you want to have serial monitor print voltages on A5-A1
+  boolean printSerial = false;  // turn true if you want to have serial monitor print voltages on A5-A1
   int serialTimer = 750;        //uncomment for serial printing
 
   /*This is the threshhold for */
   int buttonVoltage = 1000;      //when button is pressed it shows a voltage over 1000
   int refreshRate = 250;         //rate to wait between button presses and screen updates
   
-  /*When the fifth button (set brew time button) is pressed*/
-  if(analogRead(A1) > buttonVoltage){
+  /*initalize values default to 12:00a*/ 
+  int hour = 12;
+  int minute = 00;
+  char amPm = 'a';
+  
+  boolean runProgram = true;
+  
+  while(runProgram){
     
-    /*initalize values default to 12:00a*/
-    boolean brewTimeSet = false;  
-    int hour = 12;
-    int minute = 00;
-    char amPm = 'a';
     
-    /*This loop will run until the brew time is set*/
-    while(!brewTimeSet){
-     
-      clearLCDScreen();                              //clear the LCD screen
-      displaySetTimeScreen(hour, minute, amPm);      //display the current set time screen
-         
-      boolean confirmTime = false;
+    /*When the fifth button (set brew time button) is pressed*/
+    if(analogRead(A1) > buttonVoltage){
       
-      /*This loop runs until the user confirms setTime is correct*/
-      while(!confirmTime){
-        
-        
-        /*If the minus hour button is hit*/
-        if(analogRead(A5) > buttonVoltage){
-          
-          /*If we are at 1, we have to "roll over" back to twelve*/
-          if(hour == 1){
-            
-            hour = 12;                   //roll clock over from 1 to 12                 
-            
-          }
-          
-          else{
+      
+      boolean brewTimeSet = false; 
+      
+      /*This loop will run until the brew time is set*/
+      while(!brewTimeSet){
+       
+        clearLCDScreen();                              //clear the LCD screen
+        displaySetTimeScreen(hour, minute, amPm);      //display the current set time screen
            
-            hour -= 1;                  //minus an hour
+        boolean confirmTime = false;
+        
+        delay(2000);                                  //let the voltage reads over the buttons die
+        
+        /*This loop runs until the user confirms setTime is correct*/
+        while(!confirmTime){
+          
+          
+          /*If the minus hour button is hit*/
+          if(analogRead(A5) > buttonVoltage){
             
-            /*When a clock changes between 11 and 12, the am becomes pm and visaversa*/
-            if(hour == 11){            
-               /*If statement will roll am over to pm 
-              and visa versa when clock rolls over*/
-              if(amPm == 'a'){             //if its am, switch it to pm
-                amPm = 'p';
-              }
-              else{
-                amPm = 'a';                //pm switches to am
-              } 
+            /*If we are at 1, we have to "roll over" back to twelve*/
+            if(hour == 1){
+              
+              hour = 12;                   //roll clock over from 1 to 12                 
+              
             }
             
-          }          
-        }
-        
-        /*If the plus hour button is hit*/
-        if(analogRead(A4) > buttonVoltage){
-          if(hour == 12){
-            
-            hour = 1;                    //roll clock over from 12 to 1
-           
+            else{
+             
+              hour -= 1;                  //minus an hour
+              
+              /*When a clock changes between 11 and 12, the am becomes pm and visaversa*/
+              if(hour == 11){            
+                 /*If statement will roll am over to pm 
+                and visa versa when clock rolls over*/
+                if(amPm == 'a'){             //if its am, switch it to pm
+                  amPm = 'p';
+                }
+                else{
+                  amPm = 'a';                //pm switches to am
+                } 
+              }
+              
+            }          
           }
-          else{
-            hour += 1;
-            
+          
+          /*If the plus hour button is hit*/
+          if(analogRead(A4) > buttonVoltage){
             if(hour == 12){
-              /*If statement will roll am over to pm 
-              and visa versa when clock rolls over*/
-              if(amPm == 'a'){             //if its am, switch it to pm
-                amPm = 'p';
+              
+              hour = 1;                    //roll clock over from 12 to 1
+             
+            }
+            else{
+              hour += 1;
+              
+              if(hour == 12){
+                /*If statement will roll am over to pm 
+                and visa versa when clock rolls over*/
+                if(amPm == 'a'){             //if its am, switch it to pm
+                  amPm = 'p';
+                }
+                else{
+                  amPm = 'a';                //pm switches to am
+                }
               }
-              else{
-                amPm = 'a';                //pm switches to am
-              }
+              
+            }          
+          }
+          
+          /*If the minus minute button is hit*/
+          if(analogRead(A3) > buttonVoltage){
+            if(minute == 0){
+              minute = 50;
+            }
+            else{
+              minute -= 10;
+            }          
+          }
+          
+          /*If the plus minute button is hit*/
+          if(analogRead(A2) > buttonVoltage){
+            if(minute == 50){
+              minute = 0;
+            }
+            else{
+              minute += 10;
+            }          
+          }
+          
+          /*If the confirm minute button is hit*/
+          if(analogRead(A1) > buttonVoltage){
+            confirmTime = true;
+          }
+          
+          delay(refreshRate);
+          displaySetTimeScreen(hour, minute, amPm); 
+          
+        }       
+      
+        
+        String days[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        String day = days[0];
+        
+        boolean confirmDay = false;
+        int currentDay = 0;
+        
+        while(!confirmDay){
+          
+          /*If the confirm minute button is hit*/
+          if(analogRead(A5) > buttonVoltage){
+        
+            if(currentDay == 0){
+             currentDay = 6; 
+            }
+            else{
+              currentDay -= 1;
             }
             
-          }          
-        }
-        
-        /*If the minus minute button is hit*/
-        if(analogRead(A3) > buttonVoltage){
-          if(minute == 0){
-            minute = 50;
-          }
-          else{
-            minute -= 10;
-          }          
-        }
-        
-        /*If the plus minute button is hit*/
-        if(analogRead(A2) > buttonVoltage){
-          if(minute == 50){
-            minute = 0;
-          }
-          else{
-            minute += 10;
-          }          
-        }
-        
-        /*If the confirm minute button is hit*/
-        if(analogRead(A1) > buttonVoltage){
-          Serial.print("Exit loop?");
-          confirmTime = true;
-        }
-        
-        delay(refreshRate);
-        displaySetTimeScreen(hour, minute, amPm); 
-        
-      }       
-    
-      
-      String days[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-      String day = days[0];
-      
-      boolean confirmDay = false;
-      int currentDay = 0;
-      
-      while(!confirmDay){
-        
-        /*If the confirm minute button is hit*/
-        if(analogRead(A5) > buttonVoltage){
-      
-          if(currentDay == 0){
-           currentDay = 6; 
-          }
-          else{
-            currentDay -= 1;
+            day = days[currentDay];
+            
           }
           
-          day = days[currentDay];
+          
+          /*If the confirm minute button is hit*/
+          if(analogRead(A4) > buttonVoltage){
+            
+            if(currentDay == 6){
+             currentDay = 0; 
+            }
+            else{
+              currentDay += 1;
+            }
+            
+            day = days[currentDay];
+          }
+          
+          
+          /*If the confirm minute button is hit*/
+          if(analogRead(A1) > buttonVoltage){
+            confirmDay = true;
+          }
+          
+          delay(refreshRate);
+          displaySetDayScreen(day); 
           
         }
         
+        delay(2000);
+        displayBrewTime(day, hour, minute, amPm);
         
-        /*If the confirm minute button is hit*/
-        if(analogRead(A4) > buttonVoltage){
-          
-          if(currentDay == 6){
-           currentDay = 0; 
-          }
-          else{
-            currentDay += 1;
-          }
-          
-          day = days[currentDay];
-        }
-        
-        
-        /*If the confirm minute button is hit*/
-        if(analogRead(A1) > buttonVoltage){
-          confirmDay = true;
-        }
-        
-        delay(refreshRate);
-        displaySetDayScreen(day); 
+        brewTimeSet = true;
         
       }
       
     }
     
-    // set up the LCD's number of columns and rows:
-    lcd.setCursor(0, 0);
-    // Print a message to the LCD.
-    lcd.print("                ");
+    //Serial printing for reading pins and things from board
+    if(printSerial == true){
+      serialDebug(serialTimer);
+    }
     
-    
-    // set up the LCD's number of columns and rows:
-    lcd.setCursor(0, 0);
-    // Print a message to the LCD.
-    lcd.print("Brew Thur 9:00p");
+    delay(1000);
     
   }
   
-  //Serial printing for reading pins and things from board
-  if(printSerial == true){
-    serialDebug(serialTimer);
-  }
+}
+
+void displayBrewTime(String day, int hour, int minute, char amPm){
   
-  delay(1000);
+    String topLine = "Last Brewed";
+    String bottomLine = ""; 
+    
+    bottomLine += hour;
+    bottomLine += ":";
+    
+    /*This adds 00 if the minute is not 10,20,30,40, or 50*/
+    if(minute == 0){
+      bottomLine += "00";
+    }
+    else{
+      bottomLine += minute;
+    }
+    
+    bottomLine += amPm;                 //append the am or pm char
+    
+    bottomLine += "  ";
+    bottomLine += day;
+    
+    printToLCD(topLine, bottomLine);
   
 }
 
 void displaySetDayScreen(String day){
   
     /*This will be displayed on the bottom row*/
-    String setDayBottomLine = "***edit day***";
+    String topLine = "Day brewed?";
     
     
-    String setDayTopLine = "Day? ";
+    String setDay = "       ";
     
-    setDayTopLine += day;
-    printToLCD(setDayTopLine, setDayBottomLine);
+    setDay += day;
+    printToLCD(topLine, setDay);
     
     
   
@@ -244,11 +273,17 @@ void displaySetDayScreen(String day){
 void displaySetTimeScreen(int hour, int minute, char amPm){
   
     /*This will be displayed on the bottom row*/
-    String setTimeBottomLine = "***edit values***";
+    String topLine = "Time Brewed?";
     
   
     /*The next thre lines builds the brewTime to print to screen*/
-    String setTime = "Time?  ";
+    String setTime = "          ";
+    
+    /*Formatting. Adds a space if number is 1 - 9 so it lines up with the 10 - 12*/
+    if(hour <= 10){
+      setTime += " ";
+    }
+    
     setTime += hour;
     setTime += ":";
     
@@ -262,7 +297,7 @@ void displaySetTimeScreen(int hour, int minute, char amPm){
     
     setTime += amPm;                 //append the am or pm char
     
-    printToLCD(setTime, setTimeBottomLine);              //Display the current brew time       
+    printToLCD(topLine, setTime);              //Display the current brew time       
   
 }
 
