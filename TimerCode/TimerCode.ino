@@ -32,6 +32,13 @@ void setup() {
   lcd.begin(16, 2);            
   lcd.print("Set a time");
   
+  pinMode(2, INPUT);
+  pinMode(3, INPUT);
+  pinMode(4, INPUT);
+  pinMode(5, INPUT);
+  pinMode(6, INPUT);
+   
+  
   /*Turn on the serial brinter at a 9600 baud*/
   Serial.begin(9600);         
   
@@ -60,7 +67,7 @@ void loop() {
     
     
     /*When the fifth button (set brew time button) is pressed*/
-    if(analogRead(A1) > buttonVoltage){
+    if(digitalRead(6) == HIGH){
       
       
       boolean brewTimeSet = false; 
@@ -80,7 +87,7 @@ void loop() {
           
           
           /*If the minus hour button is hit*/
-          if(analogRead(A5) > buttonVoltage){
+          if(digitalRead(2) == HIGH){
             
             /*If we are at 1, we have to "roll over" back to twelve*/
             if(hour == 1){
@@ -105,11 +112,16 @@ void loop() {
                 } 
               }
               
-            }          
+            } 
+   
+   
+           delay(refreshRate);                            //Pause the system so buttons debase
+           displaySetTimeScreen(hour, minute, amPm);      //Update the screen with the new time
+           
           }
           
           /*If the plus hour button is hit*/
-          if(analogRead(A4) > buttonVoltage){
+          if(digitalRead(3) == HIGH){
             if(hour == 12){
               
               hour = 1;                    //roll clock over from 12 to 1
@@ -129,36 +141,48 @@ void loop() {
                 }
               }
               
-            }          
+            } 
+   
+            delay(refreshRate);                            //Pause the system so buttons debase
+            displaySetTimeScreen(hour, minute, amPm);      //Update the screen with the new time
+           
           }
           
           /*If the minus minute button is hit*/
-          if(analogRead(A3) > buttonVoltage){
+          if(digitalRead(4) == HIGH){
             if(minute == 0){
               minute = 50;
             }
             else{
               minute -= 10;
-            }          
+            }   
+     
+     
+            delay(refreshRate);                            //Pause the system so buttons debase
+            displaySetTimeScreen(hour, minute, amPm);      //Update the screen with the new time   
+            
           }
           
           /*If the plus minute button is hit*/
-          if(analogRead(A2) > buttonVoltage){
+          if(digitalRead(5) == HIGH){
             if(minute == 50){
               minute = 0;
             }
             else{
               minute += 10;
-            }          
+            }
+  
+            delay(refreshRate);                            //Pause the system so buttons debase
+            displaySetTimeScreen(hour, minute, amPm);      //Update the screen with the new time          
           }
           
           /*If the confirm minute button is hit*/
-          if(analogRead(A1) > buttonVoltage){
+          if(digitalRead(6) == HIGH){
+            delay(500);                                     //This gives the user a chance to stop pressing the button
             confirmTime = true;
           }
           
-          delay(refreshRate);
-          displaySetTimeScreen(hour, minute, amPm); 
+          
           
         }       
       
@@ -169,10 +193,13 @@ void loop() {
         boolean confirmDay = false;
         int currentDay = 0;
         
+        delay(refreshRate);                              //Pause the system so buttons debase
+        displaySetDayScreen(day);                        //Update the display with the new day
+        
         while(!confirmDay){
           
-          /*If the confirm minute button is hit*/
-          if(analogRead(A5) > buttonVoltage){
+          /*If the minus day button is hit*/
+          if(digitalRead(2) == HIGH){
         
             if(currentDay == 0){
              currentDay = 6; 
@@ -183,11 +210,14 @@ void loop() {
             
             day = days[currentDay];
             
+            delay(refreshRate);                              //Pause the system so buttons debase
+            displaySetDayScreen(day);                        //Update the display with the new day
+            
           }
           
           
-          /*If the confirm minute button is hit*/
-          if(analogRead(A4) > buttonVoltage){
+          /*If the plus day button is hit*/
+          if(digitalRead(3) == HIGH){
             
             if(currentDay == 6){
              currentDay = 0; 
@@ -197,27 +227,34 @@ void loop() {
             }
             
             day = days[currentDay];
+            
+            delay(refreshRate);                              //Pause the system so buttons debase
+            displaySetDayScreen(day);                        //Update the display with the new day
+            
           }
           
           
           /*If the confirm minute button is hit*/
-          if(analogRead(A1) > buttonVoltage){
+          if(digitalRead(6) == HIGH){
             confirmDay = true;
           }
           
-          delay(refreshRate);
-          displaySetDayScreen(day); 
-          
         }
         
-        delay(2000);
-        displayBrewTime(day, hour, minute, amPm);
         
-        brewTimeSet = true;
+        
+        brewTimeSet = true;                                  //both the time and date have been set. Break loop
+        
+        delay(refreshRate);                              //Pause the system so buttons debase
+        displayBrewTime(day, hour, minute, amPm);                        //Update the display with the new day
         
       }
       
+      
+      
     }
+    
+    
     
     //Serial printing for reading pins and things from board
     if(printSerial == true){
@@ -248,7 +285,7 @@ void displayBrewTime(String day, int hour, int minute, char amPm){
     
     bottomLine += amPm;                 //append the am or pm char
     
-    bottomLine += "  ";
+    bottomLine += " ";
     bottomLine += day;
     
     printToLCD(topLine, bottomLine);
