@@ -290,7 +290,7 @@ void displaySetDayScreen(String day){
         String topLine = "Day brewed?";
         
         
-        String setDay = "             ";                //White space before Day on screen
+        String setDay = "        ";                     //White space before Day on screen
         
         setDay += day;                                  //Add the day to the string
         printToLCD(topLine, setDay);                    //Print the strings to the display
@@ -306,10 +306,10 @@ void displaySetTimeScreen(int hour, int minute, char amPm){
         
     
         /*The next thre lines builds the brewTime to print to screen*/
-        String setTime = "                    ";
+        String setTime = "          ";
         
         /*Formatting. Adds a space if number is 1 - 9 so it lines up with the 10 - 12*/
-        if(hour <= 10){
+        if(hour < 10){
             setTime += " ";
         }
         
