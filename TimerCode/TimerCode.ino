@@ -5,7 +5,7 @@
 	The rest of this project was created by Matthew Muller. It is open source and can be used 
 	however you see fit. You can find this project at the link below.
 
-		https://github.com/mmuller914/BrewTimer
+		https://github.com/MatthewMuller/BrewTimer
 
 */
 
